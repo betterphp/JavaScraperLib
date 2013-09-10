@@ -35,7 +35,7 @@ public class ScraperQueue<T extends Scraper<R>, R> {
 	
 	public void scrape(){
 		this.threads = new ArrayBlockingQueue<T>(this.maxThreads);
-		this.results = Collections.synchronizedList(new ArrayList<R>());
+		this.results = Collections.synchronizedList(new ArrayList<R>(this.scrapers.size()));
 		
 		for (T scraper : this.scrapers){
 			try{
