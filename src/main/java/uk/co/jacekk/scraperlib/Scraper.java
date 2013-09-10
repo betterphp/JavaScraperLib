@@ -34,12 +34,14 @@ public abstract class Scraper<R> extends Thread implements Runnable {
 				
 				break;
 			}catch (IOException e){
+				long wait = 250l * (i * i);
+				
 				if (this.queue.verbose){
-					System.err.println("Failed to scrape " + this.url + " (" + i + "/" + this.retries + "): " + e.getMessage());
+					System.err.println("Failed to scrape " + this.url + " (" + i + "/" + this.retries + ") [waiting " + wait + " ms]: " + e.getMessage());
 				}
 				
 				try{
-					Thread.sleep(200l);
+					Thread.sleep(wait);
 				}catch (InterruptedException ie){
 					ie.printStackTrace();
 				}
