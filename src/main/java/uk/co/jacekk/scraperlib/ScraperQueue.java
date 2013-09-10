@@ -9,24 +9,28 @@ public class ScraperQueue<T extends Scraper<R>, R> {
 	
 	private int maxThreads;
 	private int retries;
-	protected boolean verbose;
+	protected ProgressHandler progressHandler;
 	protected ArrayBlockingQueue<T> threads;
 	private ArrayList<T> scrapers;
 	protected List<R> results;
 	
-	public ScraperQueue(int maxThreads, int retries, boolean verbose){
+	public ScraperQueue(int maxThreads, int retries, ProgressHandler progressHandler){
 		if (maxThreads < 1){
 			throw new IllegalArgumentException("maxThreads must be >= 1");
 		}
 		
+		if (retries < 1){
+			throw new IllegalArgumentException("retries must be >= 1");
+		}
+		
 		this.maxThreads = maxThreads;
 		this.retries = retries;
-		this.verbose = verbose;
+		this.progressHandler = progressHandler;
 		this.scrapers = new ArrayList<T>();
 	}
 	
 	public ScraperQueue(int maxThreads, int retries){
-		this(maxThreads, retries, false);
+		this(maxThreads, retries, null);
 	}
 	
 	public void addScraper(T scraper){
@@ -39,10 +43,6 @@ public class ScraperQueue<T extends Scraper<R>, R> {
 		
 		for (T scraper : this.scrapers){
 			try{
-				if (this.verbose){
-					System.out.println("Added: " + scraper.url);
-				}
-				
 				this.threads.put(scraper);
 				
 				scraper.setQueue(this);

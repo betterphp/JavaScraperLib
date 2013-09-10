@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public abstract class Scraper<R> extends Thread implements Runnable {
 	
-	protected String url;
+	private String url;
 	private ScraperQueue<?, R> queue;
 	private int retries;
 	
@@ -12,6 +12,10 @@ public abstract class Scraper<R> extends Thread implements Runnable {
 		super(url + " scraper thread");
 		
 		this.url = url;
+	}
+	
+	public String getUrl(){
+		return this.url;
 	}
 	
 	protected void setQueue(ScraperQueue<?, R> queue){
@@ -26,7 +30,12 @@ public abstract class Scraper<R> extends Thread implements Runnable {
 	public void run(){
 		for (int i = 1; i <= this.retries; ++i){
 			try{
+				long start = System.currentTimeMillis();
 				R result = this.scrape();
+				
+				if (this.queue.progressHandler != null){
+					this.queue.progressHandler.onSuccess(this, (System.currentTimeMillis() - start));
+				}
 				
 				synchronized (this.queue.results){
 					this.queue.results.add(result);
@@ -36,8 +45,8 @@ public abstract class Scraper<R> extends Thread implements Runnable {
 			}catch (IOException e){
 				long wait = 250l * (i * i);
 				
-				if (this.queue.verbose){
-					System.err.println("Failed to scrape " + this.url + " (" + i + "/" + this.retries + ") [waiting " + wait + " ms]: " + e.getMessage());
+				if (this.queue.progressHandler != null){
+					this.queue.progressHandler.onFailure(this, e, i, this.retries, wait);
 				}
 				
 				try{
