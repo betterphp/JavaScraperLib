@@ -54,6 +54,12 @@ public abstract class Scraper<R> extends Thread implements Runnable {
 				}catch (InterruptedException ie){
 					ie.printStackTrace();
 				}
+			}catch (Exception e){
+				if (this.queue.progressHandler != null){
+					this.queue.progressHandler.onFailure(this, e, i, this.retries, 0);
+				}
+				
+				break;
 			}
 		}
 		
