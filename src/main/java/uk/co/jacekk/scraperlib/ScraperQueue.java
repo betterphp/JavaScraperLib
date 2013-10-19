@@ -11,7 +11,7 @@ public class ScraperQueue<T extends Scraper<R>, R> {
 	private int retries;
 	protected ProgressHandler progressHandler;
 	protected ArrayBlockingQueue<T> threads;
-	private ArrayList<T> scrapers;
+	private List<T> scrapers;
 	protected List<R> results;
 	
 	public ScraperQueue(int maxThreads, int retries, ProgressHandler progressHandler){
@@ -26,7 +26,7 @@ public class ScraperQueue<T extends Scraper<R>, R> {
 		this.maxThreads = maxThreads;
 		this.retries = retries;
 		this.progressHandler = progressHandler;
-		this.scrapers = new ArrayList<T>();
+		this.scrapers = Collections.synchronizedList(new ArrayList<T>());
 	}
 	
 	public ScraperQueue(int maxThreads, int retries){
@@ -34,18 +34,20 @@ public class ScraperQueue<T extends Scraper<R>, R> {
 	}
 	
 	public void addScraper(T scraper){
-		this.scrapers.add(scraper);
+		synchronized (this.scrapers){
+			this.scrapers.add(scraper);
+		}
 	}
 	
 	public void scrape(){
 		this.threads = new ArrayBlockingQueue<T>(this.maxThreads);
-		this.results = Collections.synchronizedList(new ArrayList<R>(this.scrapers.size()));
+		this.results = Collections.synchronizedList(new ArrayList<R>());
 		
 		for (T scraper : this.scrapers){
 			try{
 				this.threads.put(scraper);
 				
-				scraper.setQueue(this);
+				scraper.setQueue((ScraperQueue<Scraper<R>, R>) this);
 				scraper.setRetries(this.retries);
 				scraper.start();
 			}catch (InterruptedException e){

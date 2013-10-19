@@ -5,7 +5,7 @@ import java.io.IOException;
 public abstract class Scraper<R> extends Thread implements Runnable {
 	
 	private String url;
-	private ScraperQueue<?, R> queue;
+	private ScraperQueue<Scraper<R>, R> queue;
 	private int retries;
 	
 	public Scraper(String url){
@@ -18,7 +18,7 @@ public abstract class Scraper<R> extends Thread implements Runnable {
 		return this.url;
 	}
 	
-	protected void setQueue(ScraperQueue<?, R> queue){
+	protected void setQueue(ScraperQueue<Scraper<R>, R> queue){
 		this.queue = queue;
 	}
 	
