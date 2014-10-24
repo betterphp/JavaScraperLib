@@ -17,9 +17,7 @@ public class ScraperTest {
 	public void test(){
 		ScraperQueue<SimpleScraper, String> queue = new ScraperQueue<ScraperTest.SimpleScraper, String>(2, 4, new SystemOutputProgressHandler());
 		
-		for (int i = 0; i < 10; ++i){
-			queue.addScraper(new SimpleScraper("http://jacekk.co.uk/ip.php"));
-		}
+		queue.addScraper(new SimpleScraper("http://jacekk.co.uk/ip.php"));
 		
 		queue.scrape();
 		
@@ -47,6 +45,10 @@ public class ScraperTest {
 			while (reader.read(buffer) != -1);
 			
 			results.add(buffer.toString());
+			
+			if (results.size() < 10){
+				newScrapers.add(new SimpleScraper(this.getUrl()));
+			}
 		}
 		
 	}
