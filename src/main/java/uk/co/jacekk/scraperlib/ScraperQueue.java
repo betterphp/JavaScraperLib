@@ -52,8 +52,8 @@ public class ScraperQueue<T extends Scraper<R>, R> {
 		this.threads = new ArrayBlockingQueue<ScraperThread<T, R>>(this.maxThreads);
 		this.results = Collections.synchronizedList(new ArrayList<R>());
 		
-		while (this.scrapers.hasNext()){
-			Scraper<R> scraper = this.scrapers.next();
+		while (this.scrapers.hasPrevious()){
+			Scraper<R> scraper = this.scrapers.previous();
 			
 			try{
 				ScraperThread<T, R> thread = new ScraperThread<T, R>(this, scraper, this.retries, this.progressHandler);
