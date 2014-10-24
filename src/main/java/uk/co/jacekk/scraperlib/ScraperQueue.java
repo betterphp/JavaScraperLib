@@ -53,25 +53,27 @@ public class ScraperQueue<T extends Scraper<R>, R> {
 		this.results = Collections.synchronizedList(new ArrayList<R>());
 		
 		while (this.scrapers.hasPrevious()){
-			Scraper<R> scraper = this.scrapers.previous();
-			
-			try{
-				ScraperThread<T, R> thread = new ScraperThread<T, R>(this, scraper, this.retries, this.progressHandler);
+			while (this.scrapers.hasPrevious()){
+				Scraper<R> scraper = this.scrapers.previous();
 				
-				this.threads.put(thread);
-				
-				thread.start();
-			}catch (InterruptedException e){
-				e.printStackTrace();
-			}
-		}
-		
-		synchronized (this.threads){
-			while (!this.threads.isEmpty()){
 				try{
-					this.threads.wait();
+					ScraperThread<T, R> thread = new ScraperThread<T, R>(this, scraper, this.retries, this.progressHandler);
+					
+					this.threads.put(thread);
+					
+					thread.start();
 				}catch (InterruptedException e){
 					e.printStackTrace();
+				}
+			}
+			
+			synchronized (this.threads){
+				while (!this.threads.isEmpty()){
+					try{
+						this.threads.wait();
+					}catch (InterruptedException e){
+						e.printStackTrace();
+					}
 				}
 			}
 		}
