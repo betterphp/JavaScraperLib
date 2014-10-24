@@ -17,7 +17,7 @@ public class ScraperTest {
 	public void test(){
 		ScraperQueue<SimpleScraper, String> queue = new ScraperQueue<ScraperTest.SimpleScraper, String>(2, 4, new SystemOutputProgressHandler());
 		
-		queue.addScraper(new SimpleScraper("http://jacekk.co.uk/ip.php"));
+		queue.addScraper(new SimpleScraper("http://jacekk.co.uk/ip.php", 0));
 		
 		queue.scrape();
 		
@@ -30,8 +30,12 @@ public class ScraperTest {
 	
 	private class SimpleScraper extends Scraper<String> {
 		
-		public SimpleScraper(String url){
+		private int totalResults;
+		
+		public SimpleScraper(String url, int totalResults){
 			super(url);
+			
+			this.totalResults = totalResults;
 		}
 		
 		@Override
@@ -46,8 +50,8 @@ public class ScraperTest {
 			
 			results.add(buffer.toString());
 			
-			if (results.size() < 10){
-				newScrapers.add(new SimpleScraper(this.getUrl()));
+			if (this.totalResults < 9){
+				newScrapers.add(new SimpleScraper(this.getUrl(), this.totalResults + 1));
 			}
 		}
 		
