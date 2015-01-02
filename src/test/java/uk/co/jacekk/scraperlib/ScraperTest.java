@@ -15,7 +15,7 @@ public class ScraperTest {
 	
 	@Test
 	public void test(){
-		ScraperQueue<SimpleScraper, String> queue = new ScraperQueue<ScraperTest.SimpleScraper, String>(2, 4, new SystemOutputProgressHandler());
+		ScraperQueue<SimpleScraper, String> queue = new ScraperQueue<ScraperTest.SimpleScraper, String>(2, 4, new StreamOutputProgressHandler());
 		
 		queue.addScraper(new SimpleScraper("http://jacekk.co.uk/ip.php", 0));
 		
