@@ -15,15 +15,17 @@ public class ScraperTest {
 	
 	@Test
 	public void test(){
-		ScraperQueue<SimpleScraper, String> queue = new ScraperQueue<ScraperTest.SimpleScraper, String>(2, 4, new StreamOutputProgressHandler());
+		ProgressHandler progressHandler = new StreamOutputProgressHandler();
+		CombinedListResultsHandler<String> resultsHandler = new CombinedListResultsHandler<String>();
+		ScraperQueue<SimpleScraper, String> queue = new ScraperQueue<ScraperTest.SimpleScraper, String>(2, 4, progressHandler, resultsHandler);
 		
 		queue.addScraper(new SimpleScraper("http://jacekk.co.uk/ip.php", 0));
 		
 		queue.scrape();
 		
-		Assert.assertEquals(10, queue.getResults().size());
+		Assert.assertEquals(10, resultsHandler.getResults().size());
 		
-		for (String result : queue.getResults()){
+		for (String result : resultsHandler.getResults()){
 			Assert.assertNotEquals("", result);
 		}
 	}

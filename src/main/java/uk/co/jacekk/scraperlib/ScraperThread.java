@@ -38,8 +38,8 @@ public class ScraperThread<T extends Scraper<R>, R> extends Thread implements Ru
 				
 				// Don't bother locking just to do nothing.
 				if (!results.isEmpty()){
-					synchronized (this.queue.results){
-						this.queue.results.addAll(results);
+					synchronized (this.queue.resultsHandler){
+						this.queue.resultsHandler.handleResults(results);
 					}
 				}
 				
