@@ -17,7 +17,7 @@ public class ScraperTest {
 	public void test(){
 		ProgressHandler progressHandler = new StreamOutputProgressHandler();
 		CombinedListResultsHandler<String> resultsHandler = new CombinedListResultsHandler<String>();
-		ScraperQueue<SimpleScraper, String> queue = new ScraperQueue<ScraperTest.SimpleScraper, String>(2, 4, progressHandler, resultsHandler);
+		ScraperQueue<SimpleScraper, String> queue = new ScraperQueue<ScraperTest.SimpleScraper, String>(2, 4, 10000l, progressHandler, resultsHandler);
 		
 		queue.addScraper(new SimpleScraper("http://jacekk.co.uk/ip.php", 0));
 		
