@@ -8,15 +8,17 @@ public class ScraperThread<T extends Scraper<R>, R> extends Thread implements Ru
 	private Scraper<R> scraper;
 	
 	private int retries;
+	private long maxWait;
 	private ProgressHandler progressHandler;
 	
-	public ScraperThread(ScraperQueue<T, R> queue, Scraper<R> scraper, int retries, ProgressHandler progressHandler){
+	public ScraperThread(ScraperQueue<T, R> queue, Scraper<R> scraper, int retries, long maxWait, ProgressHandler progressHandler){
 		super(scraper.getUrl() + " scraper thread");
 		
 		this.queue = queue;
 		this.scraper = scraper;
 		
 		this.retries = retries;
+		this.maxWait = maxWait;
 		this.progressHandler = progressHandler;
 	}
 	
@@ -51,7 +53,7 @@ public class ScraperThread<T extends Scraper<R>, R> extends Thread implements Ru
 				
 				break;
 			}catch (Exception e){
-				long wait = 250l * (i * i);
+				long wait = Math.min(250l * (i * i), this.maxWait);
 				
 				if (this.queue.progressHandler != null){
 					this.queue.progressHandler.onFailure(this.scraper, e, i, this.retries, wait);

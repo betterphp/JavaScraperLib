@@ -10,12 +10,13 @@ public class ScraperQueue<T extends Scraper<R>, R> {
 	
 	private int maxThreads;
 	private int retries;
+	private long maxWait;
 	protected ProgressHandler progressHandler;
 	protected ArrayBlockingQueue<ScraperThread<T, R>> threads;
 	private ListIterator<Scraper<R>> scrapers;
 	protected ResultsHandler<R> resultsHandler;
 	
-	public ScraperQueue(int maxThreads, int retries, ProgressHandler progressHandler, ResultsHandler<R> resultsHandler){
+	public ScraperQueue(int maxThreads, int retries, long maxWait, ProgressHandler progressHandler, ResultsHandler<R> resultsHandler){
 		if (maxThreads < 1){
 			throw new IllegalArgumentException("maxThreads must be >= 1");
 		}
@@ -26,13 +27,14 @@ public class ScraperQueue<T extends Scraper<R>, R> {
 		
 		this.maxThreads = maxThreads;
 		this.retries = retries;
+		this.maxWait = maxWait;
 		this.progressHandler = progressHandler;
 		this.resultsHandler = resultsHandler;
 		this.scrapers = Collections.synchronizedList(new ArrayList<Scraper<R>>()).listIterator();
 	}
 	
-	public ScraperQueue(int maxThreads, int retries){
-		this(maxThreads, retries, null, null);
+	public ScraperQueue(int maxThreads, int retries, long maxWait){
+		this(maxThreads, retries, maxWait, null, null);
 	}
 	
 	public void addScraper(Scraper<R> scraper){
@@ -57,7 +59,7 @@ public class ScraperQueue<T extends Scraper<R>, R> {
 				Scraper<R> scraper = this.scrapers.previous();
 				
 				try{
-					ScraperThread<T, R> thread = new ScraperThread<T, R>(this, scraper, this.retries, this.progressHandler);
+					ScraperThread<T, R> thread = new ScraperThread<T, R>(this, scraper, this.retries, this.maxWait, this.progressHandler);
 					
 					this.threads.put(thread);
 					
